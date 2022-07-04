@@ -46,7 +46,7 @@ buildPythonPackage rec {
     python-multipart
     pyyaml
     requests
-  ] ++ lib.optionals (pythonOlder "3.8") [
+  ] ++ lib.optionals (pythonOlder "3.10") [
     typing-extensions
   ] ++ lib.optionals (pythonOlder "3.7") [
     contextlib2
