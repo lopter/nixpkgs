@@ -32,48 +32,15 @@ let
           '';
         };
 
-        settings = mkOption {
-          type = types.submodule {
-            freeformType = format.type;
-
-            options = {
-              pid_file = mkOption {
-                default = "/run/${flavour}/${name}.pid";
-                type = types.str;
-                description = mdDoc ''
-                  Path to use for the pid file.
-                '';
-              };
-
-            };
-          };
-
-          default = { };
-
-          description =
-            let upstreamDocs =
-              if flavour == "vault-agent"
-              then "https://developer.hashicorp.com/vault/docs/agent#configuration-file-options"
-              else "https://github.com/hashicorp/consul-template/blob/main/docs/configuration.md#configuration-file";
-            in
-            mdDoc ''
-              Free-form settings written directly to the `config.json` file.
-              Refer to <${upstreamDocs}> for supported values.
-
-              ::: {.note}
-              Resulting format is JSON not HCL.
-              Refer to <https://www.hcl2json.com/> if you are unsure how to convert HCL options to JSON.
-              :::
-            '';
+        config = mkOption {
+          type = types.path;
+          description = mdDoc "Path for the HCL config";
         };
       };
     }));
   };
 
   createAgentInstance = { instance, name, flavour }:
-    let
-      configFile = format.generate "${name}.json" instance.settings;
-    in
     mkIf (instance.enable) {
       description = "${flavour} daemon - ${name}";
       wantedBy = [ "multi-user.target" ];
@@ -85,7 +52,7 @@ let
         User = instance.user;
         Group = instance.group;
         RuntimeDirectory = flavour;
-        ExecStart = "${getExe instance.package} ${optionalString ((getName instance.package) == "vault") "agent"} -config ${configFile}";
+        ExecStart = "${getExe instance.package} ${optionalString ((getName instance.package) == "vault") "agent"} -config ${instance.config}";
         ExecReload = "${pkgs.coreutils}/bin/kill -SIGHUP $MAINPID";
         KillSignal = "SIGINT";
         TimeoutStopSec = "30s";
