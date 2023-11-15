@@ -45,20 +45,6 @@ let
                 '';
               };
 
-              template = mkOption {
-                default = [ ];
-                type = with types; listOf (attrsOf anything);
-                description =
-                  let upstreamDocs =
-                    if flavour == "vault-agent"
-                    then "https://developer.hashicorp.com/vault/docs/agent/template"
-                    else "https://github.com/hashicorp/consul-template/blob/main/docs/configuration.md#templates";
-                  in
-                  mdDoc ''
-                    Template section of ${flavour}.
-                    Refer to <${upstreamDocs}> for supported values.
-                  '';
-              };
             };
           };
 
