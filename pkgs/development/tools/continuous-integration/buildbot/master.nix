@@ -141,6 +141,11 @@ buildPythonApplication rec {
     # This patch disables the test that tries to read /etc/os-release which
     # is not accessible in sandboxed builds.
     ./skip_test_linux_distro.patch
+
+    # I couldn't figure out how to override this patches attr from an overlay
+    # in my flake so here we go. NOTE: Maybe this is possible now, see:
+    # https://github.com/NixOS/nixpkgs/commit/8ddba3114f6bdedfda04ae2803240d827d7ab728
+    ./buildbot_master_private_docker_registry.patch
   ];
 
   postPatch = ''
