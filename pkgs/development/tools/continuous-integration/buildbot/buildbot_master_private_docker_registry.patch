@@ -1,0 +1,130 @@
+diff --git a/master/buildbot/worker/docker.py b/master/buildbot/worker/docker.py
+index b7befac4f..7f4969a13 100644
+--- a/master/buildbot/worker/docker.py
++++ b/master/buildbot/worker/docker.py
+@@ -144,6 +144,8 @@ class DockerLatentWorker(CompatibleLatentWorkerMixin, DockerBaseWorker):
+         encoding='gzip',
+         buildargs=None,
+         hostname=None,
++        registry_username=None,
++        registry_password=None,
+         **kwargs,
+     ):
+         super().checkConfig(name, password, image, masterFQDN, **kwargs)
+@@ -172,6 +174,15 @@ class DockerLatentWorker(CompatibleLatentWorkerMixin, DockerBaseWorker):
+                     )
+                     continue
+ 
++        invalid_registry_credentials = (
++            (registry_username is not None or registry_password is not None)
++            and (not registry_username or not registry_password)
++        )
++        if invalid_registry_credentials:
++            config.error("registry_username and registry_password must "
++                         "be used together: both need to be set or left "
++                         "out")
++
+     @defer.inlineCallbacks
+     def reconfigService(
+         self,
+@@ -194,6 +205,8 @@ class DockerLatentWorker(CompatibleLatentWorkerMixin, DockerBaseWorker):
+         target="",
+         buildargs=None,
+         hostname=None,
++        registry_username=None,
++        registry_password=None,
+         **kwargs,
+     ):
+         yield super().reconfigService(name, password, image, masterFQDN, **kwargs)
+@@ -218,6 +231,8 @@ class DockerLatentWorker(CompatibleLatentWorkerMixin, DockerBaseWorker):
+         if tls is not None:
+             self.client_args['tls'] = tls
+         self.hostname = hostname
++        self.registry_username = registry_username
++        self.registry_password = registry_password
+ 
+     def _thd_parse_volumes(self, volumes):
+         volume_list = []
+@@ -251,6 +266,8 @@ class DockerLatentWorker(CompatibleLatentWorkerMixin, DockerBaseWorker):
+             self.target,
+             self.buildargs,
+             self.hostname,
++            self.registry_username,
++            self.registry_password,
+         ))
+ 
+     @defer.inlineCallbacks
+@@ -268,6 +285,8 @@ class DockerLatentWorker(CompatibleLatentWorkerMixin, DockerBaseWorker):
+             target,
+             buildargs,
+             hostname,
++            registry_username,
++            registry_password,
+         ) = yield self.renderWorkerPropsOnStart(build)
+ 
+         res = yield threads.deferToThread(
+@@ -282,6 +301,8 @@ class DockerLatentWorker(CompatibleLatentWorkerMixin, DockerBaseWorker):
+             target,
+             buildargs,
+             hostname,
++            registry_username,
++            registry_password,
+         )
+         return res
+ 
+@@ -307,6 +328,8 @@ class DockerLatentWorker(CompatibleLatentWorkerMixin, DockerBaseWorker):
+         target,
+         buildargs,
+         hostname,
++        registry_username,
++        registry_password,
+     ):
+         curr_client_args = self.client_args.copy()
+         curr_client_args['base_url'] = docker_host
+@@ -358,7 +381,13 @@ class DockerLatentWorker(CompatibleLatentWorkerMixin, DockerBaseWorker):
+         if ((not imageExists) or self.alwaysPull) and self.autopull:
+             if not imageExists:
+                 log.msg(f"Image '{image}' not found, pulling from registry")
+-            docker_client.pull(image)
++            auth_config = None
++            if registry_username and registry_password:
++                auth_config = {
++                    "username": registry_username,
++                    "password": registry_password,
++                }
++            docker_client.pull(image, auth_config=auth_config)
+ 
+         if not self._image_exists(docker_client, image):
+             msg = f'Image "{image}" not found on docker host.'
+diff --git a/master/buildbot/worker/manager.py b/master/buildbot/worker/manager.py
+index 6a3dfca41..6ccd7d97a 100644
+--- a/master/buildbot/worker/manager.py
++++ b/master/buildbot/worker/manager.py
+@@ -66,6 +66,9 @@ class WorkerRegistration:
+     def getPBPort(self):
+         return self.pbReg.getPort()
+ 
++    def getPBProtocol(self):
++        self.pbReg.getProtocol()
++
+     def get_msgpack_port(self):
+         return self.msgpack_reg.getPort()
+ 
+diff --git a/master/buildbot/worker/protocols/manager/base.py b/master/buildbot/worker/protocols/manager/base.py
+index 0924a9f34..a53b76dd7 100644
+--- a/master/buildbot/worker/protocols/manager/base.py
++++ b/master/buildbot/worker/protocols/manager/base.py
+@@ -95,6 +95,13 @@ class Registration:
+         disp = self.manager.dispatchers[self.portstr]
+         return disp.port.getHost().port
+ 
++    def getProtocol(self):
++        """Returns the first part of the connection string (`portstr`)
++
++        It is normalized as lowercase.
++        """
++        return self.portstr.split(":")[0].lower()
++
+ 
+ class BaseDispatcher(service.AsyncService):
+     debug = False
