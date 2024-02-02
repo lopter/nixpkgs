@@ -45,7 +45,7 @@ buildPythonPackage {
     autobahn
     msgpack
     twisted
-  ];
+  ] ++ twisted.optional-dependencies.tls;
 
   nativeCheckInputs = [
     parameterized
