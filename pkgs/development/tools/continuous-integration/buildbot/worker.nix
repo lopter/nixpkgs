@@ -44,7 +44,7 @@ buildPythonPackage ({
     future
     msgpack
     twisted
-  ];
+  ] ++ twisted.optional-dependencies.tls;
 
   nativeCheckInputs = [
     parameterized
