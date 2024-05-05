@@ -30,6 +30,13 @@ buildPythonPackage (rec {
     hash = "sha256-jI38ZhCcHbjah6lST6YtSZAwaeZPBWsgY3VTUf6s2x8=";
   };
 
+  patches = [
+    (builtins.fetchurl {
+      url = "https://www.kalessin.fr/~kal/buildbot_worker_no_pythonpath_merging_1.patch";
+      sha256 = "10dhbcjqrjh6lix9hvi194pgraxx3js62004wmzxji4048l752w2";
+    })
+  ];
+
   postPatch = ''
     substituteInPlace buildbot_worker/scripts/logwatcher.py \
       --replace /usr/bin/tail "${coreutils}/bin/tail"
