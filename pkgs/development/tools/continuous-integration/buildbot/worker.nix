@@ -26,6 +26,10 @@ buildPythonPackage {
   inherit (buildbot) src version;
   format = "setuptools";
 
+  patches = [
+    ./buildbot_worker_no_pythonpath_merging.patch
+  ];
+
   postPatch = ''
     cd worker
     touch buildbot_worker/py.typed
