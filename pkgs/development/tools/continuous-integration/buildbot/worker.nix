@@ -25,6 +25,10 @@ buildPythonPackage ({
   pname = "buildbot_worker";
   inherit (buildbot) src version;
 
+  patches = [
+    ./buildbot_worker_no_pythonpath_merging.patch
+  ];
+
   postPatch = ''
     cd worker
     substituteInPlace buildbot_worker/scripts/logwatcher.py \
