@@ -1,0 +1,14 @@
+diff --git a/worker/buildbot_worker/runprocess.py b/worker/buildbot_worker/runprocess.py
+index 391d23faa..f1f7c4d90 100644
+--- a/worker/buildbot_worker/runprocess.py
++++ b/worker/buildbot_worker/runprocess.py
+@@ -353,9 +353,6 @@ class RunProcess(object):
+                     # turned in to a string.
+                     environ[key] = os.pathsep.join(environ[key])
+ 
+-            if "PYTHONPATH" in environ:
+-                environ['PYTHONPATH'] += os.pathsep + "${PYTHONPATH}"
+-
+             # do substitution on variable values matching pattern: ${name}
+             p = re.compile(r'\${([0-9a-zA-Z_]*)}')
+ 
