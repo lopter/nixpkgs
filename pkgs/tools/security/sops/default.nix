@@ -1,4 +1,4 @@
-{ lib, buildGoModule, fetchFromGitHub, nix-update-script }:
+{ lib, buildGoModule, fetchFromGitHub, fetchurl, nix-update-script }:
 
 buildGoModule rec {
   pname = "sops";
@@ -16,6 +16,13 @@ buildGoModule rec {
   subPackages = [ "cmd/sops" ];
 
   ldflags = [ "-s" "-w" "-X github.com/getsops/sops/v3/version.Version=${version}" ];
+
+  patches = [
+    (fetchurl {
+      url = "https://github.com/getsops/sops/commit/1b158865ef98313c17443a587ae438a7688d2e37.patch";
+      sha256 = "sha256-F1DKQLC1e0y0qJv9KSj7UjApI6kjlvuji5kl2H7j660=";
+    })
+  ];
 
   passthru.updateScript = nix-update-script { };
 
