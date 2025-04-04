@@ -122,23 +122,12 @@ import ./make-test-python.nix (
       # explained in: https://github.com/NixOS/nixpkgs/issues/259256
       folder = "DeleteMe";
     };
+    guiApiKey = "very_secret_key";
     addDeviceToDeleteScript = pkgs.writers.writeBash "syncthing-add-device-to-delete.sh" ''
       set -euo pipefail
 
-      export RUNTIME_DIRECTORY=/tmp
-
       curl() {
-          # get the api key by parsing the config.xml
-          while
-              ! ${pkgs.libxml2}/bin/xmllint \
-                  --xpath 'string(configuration/gui/apikey)' \
-                  ${configPath} \
-                  >"$RUNTIME_DIRECTORY/api_key"
-          do sleep 1; done
-
-          (printf "X-API-Key: "; cat "$RUNTIME_DIRECTORY/api_key") >"$RUNTIME_DIRECTORY/headers"
-
-          ${pkgs.curl}/bin/curl -sSLk -H "@$RUNTIME_DIRECTORY/headers" \
+          ${pkgs.curl}/bin/curl -sSLk -H "X-Api-Key: ${guiApiKey}" \
               --retry 1000 --retry-delay 1 --retry-all-errors \
               "$@"
       }
@@ -157,6 +146,7 @@ import ./make-test-python.nix (
         enable = true;
         overrideDevices = true;
         overrideFolders = true;
+        apiKeyFile = pkgs.writeText "syncthing-api-key" guiApiKey;
         settings = settingsWithoutId // settingsWithId;
       };
     };
