@@ -199,7 +199,8 @@ let
               for existing_id in "''${!existing_${conf_type}_ids[@]}"; do
                 if [[ ! -v new_${conf_type}_ids["$existing_id"] ]]; then
                   printf "Deleting stale ${conf_type}: %s\n" "$existing_id"
-                  curl -X DELETE ${s.baseAddress}/"$existing_id"
+                  # Use the jq @uri filter to escape any / in the id.
+                  curl -X DELETE ${s.baseAddress}/"$(echo "\"$existing_id\"" | ${jq} -r '. | @uri')"
                 fi
               done
             ''
