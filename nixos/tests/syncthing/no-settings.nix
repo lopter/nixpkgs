@@ -19,6 +19,12 @@
   #
   testScript = # python
     ''
-      a.succeed("systemctl list-unit-files | awk '$1 == \"syncthing-init.service\" {exit 1;}'")
+      a.succeed("""
+        if systemctl status syncthing-init.service; then
+          !:
+        else
+          [ $? -eq 4 ]
+        fi
+      """)
     '';
 }
