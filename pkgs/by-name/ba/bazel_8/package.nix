@@ -104,6 +104,8 @@ let
       "--announce_rc"
       "--verbose_failures"
       "--curses=no"
+      "--javacopt=-g"  # Enable debug symbols
+      "--host_javacopt=-g"
     ]
     ++ lib.optionals (isDarwin) [
       "--macos_sdk_version=${stdenv.hostPlatform.darwinMinVersion}"
