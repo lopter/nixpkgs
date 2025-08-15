@@ -25,12 +25,9 @@ let
     };
 
     vendorHash = "sha256-+cwFkqhFuLJCb02tvYjccpkNzy7tz979mjgCeqi2DC4=";
-    ldflags = [
-      "-s"
-      "-w"
-      "-X"
-      "github.com/opentofu/opentofu/version.dev=no"
-    ];
+    ldflags = [ "-X" "github.com/opentofu/opentofu/version.dev=no" ];
+    GOFLAGS = [ "'-gcflags=all=-N -l'" ];
+    dontStrip = true;
 
     postConfigure = ''
       # speakeasy hardcodes /bin/stty https://github.com/bgentry/speakeasy/issues/22
