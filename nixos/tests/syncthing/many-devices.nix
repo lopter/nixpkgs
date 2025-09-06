@@ -131,6 +131,7 @@ let
       id = "Delete Me";
     }
   ];
+  guiApiKey = "very_secret_key";
 in
 {
   name = "syncthing-many-devices";
@@ -195,6 +196,7 @@ in
       enable = true;
       overrideDevices = true;
       overrideFolders = true;
+      apiKeyFile = pkgs.writeText "syncthing-api-key" guiApiKey;
       settings = settingsWithoutId // settingsWithId;
     };
   };
