@@ -70,7 +70,11 @@ stdenv.mkDerivation {
     (
           mkdir deps/cmark-gfm/build &&
           cd deps/cmark-gfm/build &&
-          cmake -DCMARK_TESTS=OFF -DCMARK_SHARED=OFF .. &&
+          cmake \
+            -DCMARK_TESTS=OFF \
+            -DCMARK_SHARED=OFF \
+            -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+            .. &&
           cmake --build . --parallel
       )'';
 
