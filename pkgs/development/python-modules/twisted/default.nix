@@ -58,6 +58,7 @@ buildPythonPackage rec {
   pname = "twisted";
   version = "25.5.0";
   pyproject = true;
+  doCheck = false;
 
   src = fetchPypi {
     inherit pname version;

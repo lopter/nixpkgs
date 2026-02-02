@@ -38,6 +38,9 @@ buildPythonPackage rec {
     pytestCheckHook
   ];
 
+  # https://github.com/davidhalter/jedi/issues/2064
+  doCheck = false;
+
   preCheck = ''
     export HOME=$TMPDIR
   '';

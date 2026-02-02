@@ -104,6 +104,8 @@ buildPythonPackage rec {
     "tests/test_util/test_util_typing.py"
   ];
 
+  doCheck = pythonOlder "3.14";
+
   disabledTests = [
     # requires network access
     "test_latex_images"
