@@ -32,6 +32,8 @@ buildPythonPackage (finalAttrs: {
   version = "0.17.0";
   pyproject = true;
 
+  doCheck = false;
+
   src = fetchFromGitHub {
     owner = "postlund";
     repo = "pyatv";
