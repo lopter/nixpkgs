@@ -16,8 +16,8 @@ buildPythonPackage {
   src = fetchFromGitHub {
     owner = "lopter";
     repo = "dobles";
-    rev = "066c74aff5fa2771508c6ca60e3dcf43b710c452";
-    hash = "sha256-obQnqGHwp8xlNtbb45i5HE43vDnhenBn8oh8tdHnqo0=";
+    rev = "4b5a491ce8b136bd8adaae4b9ced4c137c6962f8";
+    hash = "sha256-Z9x5jjGieEY+CDkIhmx2sVRKP75ZARnj1TjUSnxkKc4=";
   };
 
   build-system = [ poetry-core ];
